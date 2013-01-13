@@ -12,8 +12,14 @@ import play.api.Play.current
 
 import anorm._
 import anorm.SqlParser._
+import play.api.libs.json._
 
-case class Card(id: Pk[Long], name: String)
+trait Card {
+  type Key
+  val NoId: Key
+  val id: Key
+  val name: String
+}
 
 trait CardModelComponent {
   val cardModel: CardModel
@@ -27,6 +33,20 @@ trait CardModelComponent {
 }
 
 trait CardModelComponentImpl extends CardModelComponent {
+  case class CardImpl(id: Pk[Long], name: String) extends Card {
+    type Key = Pk[Long]
+
+    object Key extends Writes[Key] {
+      implicit def writes(key: Key): JsValue = {
+        key match {
+          case Id(idVal: Long) => JsNumber(idVal)
+          case _ => JsNull
+        }
+      }
+    }
+    val NoId = NotAssigned
+  }
+
   class CardModelImpl extends CardModel {
     // -- Parsers
 
@@ -36,7 +56,7 @@ trait CardModelComponentImpl extends CardModelComponent {
     private val simple = {
       get[Pk[Long]]("cards.id") ~
       get[String]("cards.name") map {
-        case id~name => Card(id, name)
+        case id~name => CardImpl(id, name)
       }
     }
 
@@ -80,7 +100,7 @@ trait CardModelComponentImpl extends CardModelComponent {
       DB.withConnection { implicit connection =>
       // Insert the card
         val id: Option[Long] = SQL("insert into cards(name) values ({name})").on("name" -> name).executeInsert()
-        id.map {someId => Card(Id(someId), name)}
+        id.map {someId => CardImpl(Id(someId), name)}
       }
     }
   }

@@ -7,6 +7,7 @@
 
 import com.grumpycats.mmmtg.ComponentsRegistry
 
+import com.grumpycats.mmmtg.models.Card
 import org.specs2.mutable._
 
 import play.api.test._

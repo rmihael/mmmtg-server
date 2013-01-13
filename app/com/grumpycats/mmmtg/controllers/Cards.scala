@@ -9,12 +9,10 @@ package com.grumpycats.mmmtg.controllers
 
 import play.api._
 import mvc._
-import mvc.BodyParsers.parse
-import play.api.data._
 import play.api.libs.json._
 
-import scala.Some
-import com.grumpycats.mmmtg.models.{CardModelComponent, Card}
+import com.grumpycats.mmmtg.models._
+import anorm.{Id, Pk}
 
 trait CardsServiceComponent {
   val cardsService: CardsService
@@ -30,7 +28,7 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
 
   class CardsServiceImpl extends CardsService {
     private def cardToJson(card: Card): JsValue = {
-      Json.toJson(Map("id" -> Json.toJson(card.id.get), "name" -> Json.toJson(card.name)))
+      Json.toJson(Map("id" -> Json.toJson("1"), "name" -> Json.toJson(card.name)))
     }
 
     def index = Action { request => Ok(Json.toJson(Map("cards" -> cardModel.findAll.map(cardToJson)))) }

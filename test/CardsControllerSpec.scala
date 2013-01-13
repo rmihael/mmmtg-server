@@ -5,26 +5,30 @@
  * Time: 12:11 AM
  */
 
-import anorm.Id
-import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
-import com.grumpycats.mmmtg.models.{CardModelComponent, Card}
 import org.specs2.mutable._
-
 import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json._
 
+import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
+import com.grumpycats.mmmtg.models.{CardModelComponent, Card}
+
 trait TestCardModelComponentImpl extends CardModelComponent {
+  case class TestCard(id: Long, name: String) extends Card {
+    type Key = Long
+    val NoId = -1L
+  }
+
   class CardModelImpl extends CardModel {
     def findById(id: Long): Option[Card] = {
-      Some(Card(Id(id), "Test card"))
+      Some(TestCard(id, "Test card"))
     }
     def findAll: Seq[Card] = {
-      Seq(Card(Id(1), "Test card 1"), Card(Id(2), "Test card 2"))
+      Seq(TestCard(1, "Test card 1"), TestCard(2, "Test card 2"))
     }
     def delete(id: Long) {}
     def create(name: String): Option[Card] = {
-      Some(Card(Id(1), name))
+      Some(TestCard(1, name))
     }
   }
 }
