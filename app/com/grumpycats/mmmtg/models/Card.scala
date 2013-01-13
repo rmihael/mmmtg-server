@@ -35,7 +35,7 @@ trait CardModelComponentImpl extends CardModelComponent {
      */
     private val simple = {
       get[Pk[Long]]("cards.id") ~
-        get[String]("cards.name") map {
+      get[String]("cards.name") map {
         case id~name => Card(id, name)
       }
     }
@@ -47,7 +47,7 @@ trait CardModelComponentImpl extends CardModelComponent {
      */
     def findById(id: Long): Option[Card] = {
       DB.withConnection { implicit connection =>
-        SQL("select * from cards where id = {id}").on(
+        SQL("SELECT cards.id, cards.name FROM cards WHERE id = {id}").on(
           'id -> id
         ).as(simple.singleOpt)
       }
@@ -58,16 +58,16 @@ trait CardModelComponentImpl extends CardModelComponent {
      */
     def findAll: Seq[Card] = {
       DB.withConnection {implicit connection =>
-        SQL("select * from cards").as(simple *)
+        SQL("SELECT cards.id, cards.name FROM cards").as(simple *)
       }
     }
 
     /**
-     * Delete a project.
+     * Delete a card.
      */
     def delete(id: Long) {
       DB.withConnection { implicit connection =>
-        SQL("delete from cards where id = {id}").on(
+        SQL("DELETE FROM cards WHERE id = {id}").on(
           'id -> id
         ).executeUpdate()
       }

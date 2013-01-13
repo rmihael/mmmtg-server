@@ -25,7 +25,9 @@ trait CardsServiceComponent {
   }
 }
 
-trait CardsServiceComponentImpl extends CardsServiceComponent {this: CardModelComponent =>
+trait CardsServiceComponentImpl extends CardsServiceComponent {
+  this: CardModelComponent =>
+
   class CardsServiceImpl extends CardsService {
     private def cardToJson(card: Card): JsValue = {
       Json.toJson(Map("id" -> Json.toJson(card.id.get), "name" -> Json.toJson(card.name)))

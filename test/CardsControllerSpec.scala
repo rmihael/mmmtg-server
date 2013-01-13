@@ -38,10 +38,12 @@ CardsServiceComponentImpl {
 }
 
 class CardsControllerSpec extends Specification {
+  val cardsService = TestComponentsRegistry.cardsService
+
   "The Cards controller" should {
     "answer to index call" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        val result = TestComponentsRegistry.cardsService.index(FakeRequest())
+        val result = cardsService.index(FakeRequest())
         status(result) must equalTo(OK)
         contentType(result) must beSome("application/json")
         charset(result) must beSome("utf-8")
@@ -50,7 +52,7 @@ class CardsControllerSpec extends Specification {
 
     "list cards in response to index call" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        val result = TestComponentsRegistry.cardsService.index(FakeRequest())
+        val result = cardsService.index(FakeRequest())
         Json.parse(contentAsString(result)) match {
           case JsObject(
             Seq(("cards", JsArray(Seq(
@@ -66,7 +68,7 @@ class CardsControllerSpec extends Specification {
     "answer to create call" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
         val body = Json.parse("""{"name": "Force of Will"}""")
-        val result = TestComponentsRegistry.cardsService.create(FakeRequest().copy(body=body))
+        val result = cardsService.create(FakeRequest().copy(body=body))
         status(result) must equalTo(OK)
         contentType(result) must beSome("application/json")
         charset(result) must beSome("utf-8")
