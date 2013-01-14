@@ -6,6 +6,7 @@
  */
 
 import org.specs2.mutable._
+
 import play.api.test._
 import play.api.test.Helpers._
 import play.api.libs.json._
@@ -14,7 +15,7 @@ import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
 import com.grumpycats.mmmtg.models.{CardModelComponent, Card}
 
 trait TestCardModelComponentImpl extends CardModelComponent {
-  case class TestCard(id: Long, name: String) extends Card {
+  case class TestCard(id: Long, name: String, block: String) extends Card {
     type Key = Long
     val NoId = -1L
 
@@ -25,14 +26,14 @@ trait TestCardModelComponentImpl extends CardModelComponent {
 
   class CardModelImpl extends CardModel {
     def findById(id: Long): Option[Card] = {
-      Some(TestCard(id, "Test card"))
+      Some(TestCard(id, "Test card", "Block"))
     }
     def findAll: Seq[Card] = {
-      Seq(TestCard(1, "Test card 1"), TestCard(2, "Test card 2"))
+      Seq(TestCard(1, "Test card 1", "Block 1"), TestCard(2, "Test card 2", "Block 2"))
     }
     def delete(id: Long) {}
-    def create(name: String): Option[Card] = {
-      Some(TestCard(1, name))
+    def create(name: String, block: String): Option[Card] = {
+      Some(TestCard(1, name, block))
     }
   }
 }
@@ -64,8 +65,8 @@ class CardsControllerSpec extends Specification {
         Json.parse(contentAsString(result)) match {
           case JsObject(
             Seq(("cards", JsArray(Seq(
-              JsObject(Seq(("id", JsNumber(_)), ("name", JsString(_)))),
-              JsObject(Seq(("id", JsNumber(_)), ("name", JsString(_))))
+              JsObject(Seq(("id", JsNumber(_)), ("name", JsString(_)), ("block", JsString(_)))),
+              JsObject(Seq(("id", JsNumber(_)), ("name", JsString(_)), ("block", JsString(_))))
             ))))
           ) => success
           case _ => failure("Wrong JSON structure: %s".format(contentAsString(result)))
@@ -75,14 +76,14 @@ class CardsControllerSpec extends Specification {
 
     "answer to create call" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        val body = Json.parse("""{"name": "Force of Will"}""")
+        val body = Json.parse("""{"name": "Force of Will", "block": "Alliances"}""")
         val result = cardsService.create(FakeRequest().copy(body=body))
         status(result) must equalTo(OK)
         contentType(result) must beSome("application/json")
         charset(result) must beSome("utf-8")
         val resultJson = Json.parse(contentAsString(result))
         resultJson match {
-          case JsObject(Seq(("id", JsNumber(_)), ("name", JsString(name)))) => name must equalTo("Force of Will")
+          case JsObject(Seq(("id", JsNumber(_)), ("name", JsString(name)), ("block", JsString(_)))) => name must equalTo("Force of Will")
           case _ => failure("Wrong JSON structure")
         }
       }

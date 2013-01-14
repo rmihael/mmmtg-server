@@ -7,7 +7,6 @@
 
 import com.grumpycats.mmmtg.ComponentsRegistry
 
-import com.grumpycats.mmmtg.models.Card
 import org.specs2.mutable._
 
 import play.api.test._
@@ -19,8 +18,9 @@ class CardModelSpec extends Specification {
   "The card model" should {
     "be persisted" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        cardModel.create("Force or Will")
-        cardModel.findAll must have size 1
+        val currentCount = cardModel.findAll.size
+        cardModel.create("Force or Will", "Alliances")
+        cardModel.findAll must have size currentCount+1
       }
     }
   }

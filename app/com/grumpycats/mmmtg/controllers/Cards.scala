@@ -30,7 +30,7 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
     private implicit object cardWriter extends Writes[Card] {
       def writes(card: Card): JsValue = {
         import card.Key // this import brings implicit JSON conversion for card.id
-        Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name)))
+        Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name), "block" -> Json.toJson(card.block)))
       }
     }
 
@@ -39,7 +39,8 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
     def create = Action(parse.json) { request =>
       val maybeCard = for {
         name <- (request.body \ "name").asOpt[String]
-        card <- cardModel.create(name)
+        block <- (request.body \ "block").asOpt[String]
+        card <- cardModel.create(name, block)
       } yield card
       maybeCard match {
         case Some(card) => Ok(Json.toJson(card))
