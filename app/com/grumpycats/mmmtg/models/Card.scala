@@ -19,6 +19,8 @@ trait Card {
   val NoId: Key
   val id: Key
   val name: String
+
+  implicit val Key: Writes[Key]
 }
 
 trait CardModelComponent {
@@ -36,8 +38,8 @@ trait CardModelComponentImpl extends CardModelComponent {
   case class CardImpl(id: Pk[Long], name: String) extends Card {
     type Key = Pk[Long]
 
-    object Key extends Writes[Key] {
-      implicit def writes(key: Key): JsValue = {
+    implicit object Key extends Writes[Key] {
+      def writes(key: Key): JsValue = {
         key match {
           case Id(idVal: Long) => JsNumber(idVal)
           case _ => JsNull

@@ -28,7 +28,8 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
 
   class CardsServiceImpl extends CardsService {
     private def cardToJson(card: Card): JsValue = {
-      Json.toJson(Map("id" -> Json.toJson("1"), "name" -> Json.toJson(card.name)))
+      import card.Key
+      Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name)))
     }
 
     def index = Action { request => Ok(Json.toJson(Map("cards" -> cardModel.findAll.map(cardToJson)))) }
