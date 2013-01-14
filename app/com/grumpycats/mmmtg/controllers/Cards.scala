@@ -27,12 +27,14 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
   this: CardModelComponent =>
 
   class CardsServiceImpl extends CardsService {
-    private def cardToJson(card: Card): JsValue = {
-      import card.Key
-      Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name)))
+    private implicit object cardWriter extends Writes[Card] {
+      def writes(card: Card): JsValue = {
+        import card.Key // this import brings implicit JSON conversion for card.id
+        Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name)))
+      }
     }
 
-    def index = Action { request => Ok(Json.toJson(Map("cards" -> cardModel.findAll.map(cardToJson)))) }
+    def index = Action { request => Ok(Json.toJson(Map("cards" -> cardModel.findAll))) }
 
     def create = Action(parse.json) { request =>
       val maybeCard = for {
@@ -40,7 +42,7 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
         card <- cardModel.create(name)
       } yield card
       maybeCard match {
-        case Some(card) => Ok(cardToJson(card))
+        case Some(card) => Ok(Json.toJson(card))
         case None => BadRequest(Json.toJson(Map("message" -> "some shit happened")))
       }
     }

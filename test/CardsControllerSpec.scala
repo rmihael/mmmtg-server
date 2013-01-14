@@ -17,6 +17,10 @@ trait TestCardModelComponentImpl extends CardModelComponent {
   case class TestCard(id: Long, name: String) extends Card {
     type Key = Long
     val NoId = -1L
+
+    implicit object Key extends Writes[Key] {
+      def writes(key: Key) = { JsNumber(key) }
+    }
   }
 
   class CardModelImpl extends CardModel {
