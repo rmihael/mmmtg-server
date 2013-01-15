@@ -12,28 +12,26 @@ import play.api.test.Helpers._
 import play.api.libs.json._
 
 import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
-import com.grumpycats.mmmtg.models.{CardModelComponent, Card}
+import com.grumpycats.mmmtg.models.CardModelComponent
 
 trait TestCardModelComponentImpl extends CardModelComponent {
-  case class TestCard(id: Long, name: String, block: String) extends Card {
-    type Key = Long
-    val NoId = -1L
+  type Key = Long
+  val NoId = -1L
 
-    implicit object Key extends Writes[Key] {
-      def writes(key: Key) = { JsNumber(key) }
-    }
+  implicit object Key extends Writes[Key] {
+    def writes(key: Key) = { JsNumber(key) }
   }
 
   class CardModelImpl extends CardModel {
-    def findById(id: Long): Option[Card] = {
-      Some(TestCard(id, "Test card", "Block"))
+    def findById(id: Key): Option[Card] = {
+      Some(Card(id, "Test card", "Block"))
     }
     def findAll: Seq[Card] = {
-      Seq(TestCard(1, "Test card 1", "Block 1"), TestCard(2, "Test card 2", "Block 2"))
+      Seq(Card(1, "Test card 1", "Block 1"), Card(2, "Test card 2", "Block 2"))
     }
-    def delete(id: Long) {}
+    def delete(id: Key) {}
     def create(name: String, block: String): Option[Card] = {
-      Some(TestCard(1, name, block))
+      Some(Card(1, name, block))
     }
   }
 }
@@ -41,7 +39,6 @@ trait TestCardModelComponentImpl extends CardModelComponent {
 object TestComponentsRegistry extends
 TestCardModelComponentImpl with
 CardsServiceComponentImpl {
-
   val cardModel = new CardModelImpl
   val cardsService = new CardsServiceImpl
 }

@@ -29,7 +29,6 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
   class CardsServiceImpl extends CardsService {
     private implicit object cardWriter extends Writes[Card] {
       def writes(card: Card): JsValue = {
-        import card.Key // this import brings implicit JSON conversion for card.id
         Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name), "block" -> Json.toJson(card.block)))
       }
     }
