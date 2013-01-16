@@ -11,14 +11,8 @@ import org.specs2.mutable._
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
-import com.grumpycats.mmmtg.models.{PricesModelComponent, CardModelComponentImpl}
-
-trait TestPricesModelComponentImpl extends PricesModelComponent {
-  class PricesModelImpl extends PricesModel {
-    def findByCardId(card_id: String) = Map(DateTime.now -> 1.0)
-    def appendToCard(card_id: String, datetime: DateTime, price: Double) {}
-  }
-}
+import com.grumpycats.mmmtg.models.CardModelComponentImpl
+import stubs.TestPricesModelComponentImpl
 
 class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponentImpl with Specification {
   val cardModel = new CardModelImpl

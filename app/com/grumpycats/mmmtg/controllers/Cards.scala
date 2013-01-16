@@ -27,12 +27,6 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
   this: CardModelComponent =>
 
   class CardsServiceImpl extends CardsService {
-    private implicit object cardWriter extends Writes[Card] {
-      def writes(card: Card): JsValue = {
-        Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name), "block" -> Json.toJson(card.block)))
-      }
-    }
-
     def index = Action { request => Ok(Json.toJson(Map("cards" -> cardModel.findAll))) }
 
     def create = Action(parse.json) { request =>

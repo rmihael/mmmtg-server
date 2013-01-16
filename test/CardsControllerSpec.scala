@@ -12,38 +12,12 @@ import play.api.test.Helpers._
 import play.api.libs.json._
 
 import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
-import com.grumpycats.mmmtg.models.CardModelComponent
+import stubs.{TestCardModelComponentImpl, TestPricesModelComponentImpl}
 
-trait TestCardModelComponentImpl extends CardModelComponent {
-  type Key = Long
-
-  implicit object Key extends Writes[Key] {
-    def writes(key: Key) = { JsNumber(key) }
-  }
-
-  class CardModelImpl extends CardModel {
-    def findById(id: Key): Option[Card] = {
-      Some(Card(id, "Test card", "Block"))
-    }
-    def findAll: Seq[Card] = {
-      Seq(Card(1, "Test card 1", "Block 1"), Card(2, "Test card 2", "Block 2"))
-    }
-    def delete(id: Key) {}
-    def create(name: String, block: String): Option[Card] = {
-      Some(Card(1, name, block))
-    }
-  }
-}
-
-object TestComponentsRegistry extends
-TestCardModelComponentImpl with
-CardsServiceComponentImpl {
+class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelComponentImpl with TestPricesModelComponentImpl with Specification {
   val cardModel = new CardModelImpl
+  val pricesModel = new PricesModelImpl
   val cardsService = new CardsServiceImpl
-}
-
-class CardsControllerSpec extends Specification {
-  val cardsService = TestComponentsRegistry.cardsService
 
   "The Cards controller" should {
     "answer to index call" in {

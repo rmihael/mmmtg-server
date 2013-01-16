@@ -15,15 +15,23 @@ import play.api.Play.current
 import org.scala_tools.time.Imports._
 
 trait PricesModelComponent {
+  type PricesModelKey
+
+  implicit def String2PricesModelKey(value: String): PricesModelKey
+
   val pricesModel: PricesModel
 
   trait PricesModel {
-    def findByCardId(card_id: String): Map[DateTime, Double]
-    def appendToCard(card_id: String, datetime: DateTime, price: Double)
+    def findByCardId(card_id: PricesModelKey): Map[DateTime, Double]
+    def appendToCard(card_id: PricesModelKey, datetime: DateTime, price: Double)
   }
 }
 
 trait PricesModelComponentImpl extends PricesModelComponent {
+  type PricesModelKey = Pk[Long]
+
+  implicit def String2PricesModelKey(value: String): PricesModelKey = Id(Integer.parseInt(value))
+
   class PricesModelImpl extends PricesModel {
     /**
      * Parse a single price from a ResultSet
@@ -35,19 +43,17 @@ trait PricesModelComponentImpl extends PricesModelComponent {
       }
     }
 
-    private implicit def String2Key(value: String): Pk[Long] = Id(Integer.parseInt(value))
-
-    def findByCardId(card_id: String): Map[DateTime, Double] = {
+    def findByCardId(card_id: PricesModelKey): Map[DateTime, Double] = {
       DB.withConnection { implicit connection =>
         SQL("SELECT dt, price FROM prices WHERE card_id = {card_id}")
-          .on("card_id" -> Integer.parseInt(card_id)).as(simple *).toMap
+          .on("card_id" -> card_id).as(simple *).toMap
       }
     }
 
-    def appendToCard(card_id: String, datetime: DateTime, price: Double) {
+    def appendToCard(card_id: PricesModelKey, datetime: DateTime, price: Double) {
       DB.withConnection { implicit connection =>
         SQL("INSERT INTO prices(card_id, dt, price) VALUES ({card_id}, {dt}, {price})")
-          .on("card_id" -> Integer.parseInt(card_id), "dt" -> datetime.millis, "price" -> price).executeInsert()
+          .on("card_id" -> card_id, "dt" -> datetime.millis, "price" -> price).executeInsert()
       }
     }
   }

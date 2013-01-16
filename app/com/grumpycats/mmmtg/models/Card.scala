@@ -17,15 +17,22 @@ import play.api.libs.json._
 trait CardModelComponent {
   val cardModel: CardModel
 
-  type Key
-  implicit val Key: Writes[Key]
+  type CardModelKey
+  implicit def String2CardModelKey(value: String): CardModelKey
+  implicit val Key: Writes[CardModelKey]
 
-  case class Card(id: Key, name: String, block: String)
+  implicit object cardWriter extends Writes[Card] {
+    def writes(card: Card): JsValue = {
+      Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name), "block" -> Json.toJson(card.block)))
+    }
+  }
+
+  case class Card(id: CardModelKey, name: String, block: String)
 
   trait CardModel {
-    def findById(id: Key): Option[Card]
+    def findById(id: CardModelKey): Option[Card]
     def findAll: Seq[Card]
-    def delete(id: Key)
+    def delete(id: CardModelKey)
     def create(name: String, block: String): Option[Card]
   }
 }
@@ -33,9 +40,10 @@ trait CardModelComponent {
 trait CardModelComponentImpl extends CardModelComponent {
   this: PricesModelComponent =>
 
-  type Key = Pk[Long]
-  implicit object Key extends Writes[Key] {
-    def writes(key: Key): JsValue = {
+  type CardModelKey = Pk[Long]
+  implicit def String2CardModelKey(value: String): CardModelKey = Id(Integer.parseInt(value))
+  implicit object Key extends Writes[CardModelKey] {
+    def writes(key: CardModelKey): JsValue = {
       key match {
         case Id(idVal: Long) => JsNumber(idVal)
         case _ => JsNull
@@ -62,7 +70,7 @@ trait CardModelComponentImpl extends CardModelComponent {
     /**
      * Retrieve a Card by id.
      */
-    def findById(id: Key): Option[Card] = {
+    def findById(id: CardModelKey): Option[Card] = {
       DB.withConnection { implicit connection =>
         SQL("SELECT cards.id, cards.name, blocks.name FROM cards JOIN blocks ON cards.block_id = blocks.id WHERE id = {id}").on(
           'id -> id
@@ -82,7 +90,7 @@ trait CardModelComponentImpl extends CardModelComponent {
     /**
      * Delete a card.
      */
-    def delete(id: Key) {
+    def delete(id: CardModelKey) {
       DB.withConnection { implicit connection =>
         SQL("DELETE FROM cards WHERE id = {id}").on(
           'id -> id
