@@ -18,7 +18,6 @@ trait CardModelComponent {
   val cardModel: CardModel
 
   type Key
-  val NoId: Key
   implicit val Key: Writes[Key]
 
   case class Card(id: Key, name: String, block: String)
@@ -32,6 +31,8 @@ trait CardModelComponent {
 }
 
 trait CardModelComponentImpl extends CardModelComponent {
+  this: PricesModelComponent =>
+
   type Key = Pk[Long]
   implicit object Key extends Writes[Key] {
     def writes(key: Key): JsValue = {
@@ -41,7 +42,6 @@ trait CardModelComponentImpl extends CardModelComponent {
       }
     }
   }
-  val NoId = NotAssigned
 
   class CardModelImpl extends CardModel {
     // -- Parsers

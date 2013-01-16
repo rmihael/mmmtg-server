@@ -16,7 +16,6 @@ import com.grumpycats.mmmtg.models.CardModelComponent
 
 trait TestCardModelComponentImpl extends CardModelComponent {
   type Key = Long
-  val NoId = -1L
 
   implicit object Key extends Writes[Key] {
     def writes(key: Key) = { JsNumber(key) }
