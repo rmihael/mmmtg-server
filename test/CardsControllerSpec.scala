@@ -35,8 +35,8 @@ class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelCo
         Json.parse(contentAsString(result)) match {
           case JsObject(
             Seq(("cards", JsArray(Seq(
-              JsObject(Seq(("id", JsNumber(_)), ("name", JsString(_)), ("block", JsString(_)))),
-              JsObject(Seq(("id", JsNumber(_)), ("name", JsString(_)), ("block", JsString(_))))
+              JsObject(Seq(("id", JsNumber(_)), ("name", JsString(_)), ("block", JsString(_)), ("prices", JsObject(_)))),
+              JsObject(Seq(("id", JsNumber(_)), ("name", JsString(_)), ("block", JsString(_)), ("prices", JsObject(_))))
             ))))
           ) => success
           case _ => failure("Wrong JSON structure: %s".format(contentAsString(result)))
@@ -53,7 +53,7 @@ class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelCo
         charset(result) must beSome("utf-8")
         val resultJson = Json.parse(contentAsString(result))
         resultJson match {
-          case JsObject(Seq(("id", JsNumber(_)), ("name", JsString(name)), ("block", JsString(_)))) => name must equalTo("Force of Will")
+          case JsObject(Seq(("id", JsNumber(_)), ("name", JsString(name)), ("block", JsString(_)), ("prices", JsObject(_)))) => name must equalTo("Force of Will")
           case _ => failure("Wrong JSON structure")
         }
       }

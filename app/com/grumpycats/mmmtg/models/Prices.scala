@@ -22,7 +22,7 @@ trait PricesModelComponent {
   val pricesModel: PricesModel
 
   trait PricesModel {
-    def findByCardId(card_id: PricesModelKey): Map[DateTime, Double]
+    def findByCardId(card_id: PricesModelKey): Seq[(DateTime, Double)]
     def appendToCard(card_id: PricesModelKey, datetime: DateTime, price: Double)
   }
 }
@@ -43,10 +43,10 @@ trait PricesModelComponentImpl extends PricesModelComponent {
       }
     }
 
-    def findByCardId(card_id: PricesModelKey): Map[DateTime, Double] = {
+    def findByCardId(card_id: PricesModelKey): Seq[(DateTime, Double)] = {
       DB.withConnection { implicit connection =>
-        SQL("SELECT dt, price FROM prices WHERE card_id = {card_id}")
-          .on("card_id" -> card_id).as(simple *).toMap
+        SQL("SELECT dt, price FROM prices WHERE card_id = {card_id} ORDER BY dt ASC")
+          .on("card_id" -> card_id).as(simple *)
       }
     }
 

@@ -13,21 +13,29 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 import play.api.libs.json._
+import org.scala_tools.time.Imports._
+import anorm.Id
+import play.api.libs.json.JsNumber
 
 trait CardModelComponent {
   val cardModel: CardModel
 
   type CardModelKey
+  case class Card(id: CardModelKey, name: String, block: String, prices: Seq[(DateTime, Double)])
+
   implicit def String2CardModelKey(value: String): CardModelKey
   implicit val Key: Writes[CardModelKey]
 
-  implicit object cardWriter extends Writes[Card] {
-    def writes(card: Card): JsValue = {
-      Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name), "block" -> Json.toJson(card.block)))
-    }
+  implicit object dateTimeWriter extends Writes[Seq[(DateTime, Double)]] {
+    def writes(datetimes: Seq[(DateTime, Double)]) = JsObject(datetimes map { case (dt, price) => dt.millis.toString -> JsNumber(price)})
   }
 
-  case class Card(id: CardModelKey, name: String, block: String)
+  implicit object cardWriter extends Writes[Card] {
+    def writes(card: Card): JsValue = {
+      Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name),
+                      "block" -> Json.toJson(card.block), "prices" -> Json.toJson(card.prices)))
+    }
+  }
 
   trait CardModel {
     def findById(id: CardModelKey): Option[Card]
@@ -61,7 +69,7 @@ trait CardModelComponentImpl extends CardModelComponent {
       get[Pk[Long]]("cards.id") ~
       get[String]("cards.name") ~
       get[String]("blocks.name") map {
-        case id~name~block => Card(id, name, block)
+        case id~name~block => Card(id, name, block, pricesModel.findByCardId(id.toString))
       }
     }
 
@@ -106,7 +114,7 @@ trait CardModelComponentImpl extends CardModelComponent {
       // Insert the card
         val id: Option[Long] = SQL("insert into cards(name, block_id) values ({name}, (SELECT id from blocks WHERE name={block}))")
           .on("name" -> name, "block" -> block).executeInsert()
-        id.map {someId => Card(Id(someId), name, block)}
+        id.map {someId => Card(Id(someId), name, block, Seq())}
       }
     }
   }

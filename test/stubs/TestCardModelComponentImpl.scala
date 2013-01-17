@@ -22,14 +22,14 @@ trait TestCardModelComponentImpl extends CardModelComponent {
 
   class CardModelImpl extends CardModel {
     def findById(id: CardModelKey): Option[Card] = {
-      Some(Card(id, "Test card", "Block"))
+      Some(Card(id, "Test card", "Block", Seq()))
     }
     def findAll: Seq[Card] = {
-      Seq(Card(1, "Test card 1", "Block 1"), Card(2, "Test card 2", "Block 2"))
+      Seq(Card(1, "Test card 1", "Block 1", Seq()), Card(2, "Test card 2", "Block 2", Seq()))
     }
     def delete(id: CardModelKey) {}
     def create(name: String, block: String): Option[Card] = {
-      Some(Card(1, name, block))
+      Some(Card(1, name, block, Seq()))
     }
   }
 }
