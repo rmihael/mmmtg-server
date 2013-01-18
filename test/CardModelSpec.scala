@@ -28,7 +28,7 @@ class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponent
 
     "have no prices after creating" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        cardModel.create("Force or Will", "Alliances").get.prices must be empty
+        cardModel.create("Force or Will", "Alliances").get.prices must have size 0
       }
     }
 

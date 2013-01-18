@@ -7,27 +7,24 @@
 
 package com.grumpycats.mmmtg.models
 
-import play.api.db._
-import play.api.Play.current
-
 import anorm._
 import anorm.SqlParser._
+import play.api.db._
 import play.api.libs.json._
+import play.api.Play.current
 import org.scala_tools.time.Imports._
-import anorm.Id
-import play.api.libs.json.JsNumber
 
 trait CardModelComponent {
   val cardModel: CardModel
 
   type CardModelKey
-  case class Card(id: CardModelKey, name: String, block: String, prices: Seq[(DateTime, Double)])
+  case class Card(id: CardModelKey, name: String, block: String, prices: PricesHistory)
 
   implicit def String2CardModelKey(value: String): CardModelKey
   implicit val Key: Writes[CardModelKey]
 
-  implicit object dateTimeWriter extends Writes[Seq[(DateTime, Double)]] {
-    def writes(datetimes: Seq[(DateTime, Double)]) = JsObject(datetimes map { case (dt, price) => dt.millis.toString -> JsNumber(price)})
+  implicit object dateTimeWriter extends Writes[PricesHistory] {
+    def writes(datetimes: PricesHistory) = JsObject(datetimes map { case (dt, price) => dt.millis.toString -> JsNumber(price)})
   }
 
   implicit object cardWriter extends Writes[Card] {

@@ -11,7 +11,6 @@ import anorm._
 import anorm.SqlParser._
 import play.api.db._
 import play.api.Play.current
-
 import org.scala_tools.time.Imports._
 
 trait PricesModelComponent {
@@ -22,7 +21,7 @@ trait PricesModelComponent {
   val pricesModel: PricesModel
 
   trait PricesModel {
-    def findByCardId(card_id: PricesModelKey): Seq[(DateTime, Double)]
+    def findByCardId(card_id: PricesModelKey): PricesHistory
     def appendToCard(card_id: PricesModelKey, datetime: DateTime, price: Double)
   }
 }
@@ -43,7 +42,7 @@ trait PricesModelComponentImpl extends PricesModelComponent {
       }
     }
 
-    def findByCardId(card_id: PricesModelKey): Seq[(DateTime, Double)] = {
+    def findByCardId(card_id: PricesModelKey): PricesHistory = {
       DB.withConnection { implicit connection =>
         SQL("SELECT dt, price FROM prices WHERE card_id = {card_id} ORDER BY dt ASC")
           .on("card_id" -> card_id).as(simple *)
