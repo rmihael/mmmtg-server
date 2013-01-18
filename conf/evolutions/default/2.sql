@@ -1,7 +1,7 @@
 # --- !Ups
 
-INSERT INTO blocks VALUES(1, 'Revised');
-INSERT INTO blocks VALUES(2, 'Alliances');
+INSERT INTO blocks VALUES(1, 'Revised', 'REV');
+INSERT INTO blocks VALUES(2, 'Alliances', 'AI');
 
 INSERT INTO cards(name, block_id) VALUES ('Force of Will', 1);
 INSERT INTO cards(name, block_id) VALUES ('Underground Sea', 2);

@@ -2,7 +2,8 @@
 
 create table blocks (
   id                        bigint not null primary key auto_increment,
-  name                      varchar(255) not null
+  name                      varchar(255) not null,
+  shortname                 varchar(3) not null
 );
 
 create table cards (

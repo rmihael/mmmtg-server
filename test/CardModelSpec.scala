@@ -5,6 +5,7 @@
  * Time: 8:58 PM
  */
 
+import org.specs2.matcher.DataTables
 import org.specs2.mutable._
 
 import play.api.test.FakeApplication
@@ -13,7 +14,7 @@ import play.api.test.Helpers._
 import com.grumpycats.mmmtg.models.CardModelComponentImpl
 import stubs.TestPricesModelComponentImpl
 
-class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponentImpl with Specification {
+class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponentImpl with Specification with DataTables {
   val cardModel = new CardModelImpl
   val pricesModel = new PricesModelImpl
 
@@ -34,11 +35,21 @@ class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponent
 
     "find card by set and card name" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        val card = cardModel.create("Test Card", "Alliances").get
-        cardModel.findByNameAndBlock("Test Card", "Alliances") must beSome.which { foundCard =>
-          foundCard match {
-            case Card(card.id, card.name, card.block, _) => true
-            case _ => false
+        "Card name"    ||    "Block name"    |
+        "Test card"    !!    "Alliances"     |
+        "test card"    !!    "alliances"     |
+        "test card"    !!    "Alliances"     |
+        "test card"    !!    "AI"            |
+        "test card"    !!    "ai"            |>
+        { (name, block) =>
+          val card = cardModel.create("Test Card", "Alliances").get
+          val result = cardModel.findByNameAndBlock(name, block)
+          cardModel.delete(card.id)
+          result must beSome.which { foundCard =>
+            foundCard match {
+              case Card(card.id, card.name, card.block, _) => true
+              case _ => false
+            }
           }
         }
       }

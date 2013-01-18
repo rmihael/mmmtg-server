@@ -35,12 +35,11 @@ trait PricesModelComponentImpl extends PricesModelComponent {
     /**
      * Parse a single price from a ResultSet
      */
-    private val simple = {
-        get[Long]("prices.dt") ~
-        get[Double]("prices.price") map {
+    private val simple =
+      get[Long]("prices.dt") ~
+      get[Double]("prices.price") map {
         case tstamp~price => new DateTime(tstamp) -> price
       }
-    }
 
     def findByCardId(card_id: PricesModelKey): PricesHistory = {
       DB.withConnection { implicit connection =>

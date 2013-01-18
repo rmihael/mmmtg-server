@@ -40,5 +40,19 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
         case None => BadRequest(Json.toJson(Map("message" -> "some shit happened")))
       }
     }
+
+    def findByName(name: String, block: String) = Action {
+      cardModel.findByNameAndBlock(name, block) match {
+        case Some(card) => Ok(Json.toJson(card))
+        case _ => NotFound
+      }
+    }
+
+    def findById(id: String) = Action {
+      cardModel.findById(id) match {
+        case Some(card) => Ok(Json.toJson(card))
+        case _ => NotFound
+      }
+    }
   }
 }

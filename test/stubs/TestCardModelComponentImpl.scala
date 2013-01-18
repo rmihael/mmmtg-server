@@ -23,8 +23,14 @@ trait TestCardModelComponentImpl extends CardModelComponent {
   implicit def String2CardModelKey(value: String) = Integer.parseInt(value)
 
   class CardModelImpl extends CardModel {
-    def findById(id: CardModelKey): Option[Card] = Some(Card(id, "Test card", "Block", pricesModel.findByCardId("1")))
-    def findByNameAndBlock(name: String, block: String): Option[Card] = Some(Card(1, name, block, pricesModel.findByCardId("1")))
+    def findById(id: CardModelKey): Option[Card] = id match {
+      case 0 => None
+      case _ => Some(Card(id, "Test card", "Block", pricesModel.findByCardId("1")))
+    }
+    def findByNameAndBlock(name: String, block: String): Option[Card] = name match {
+      case "No Card" => None
+      case _ => Some(Card(1, name, block, pricesModel.findByCardId("1")))
+    }
     def findAll: Seq[Card] = Seq(Card(1, "Test card 1", "Block 1", pricesModel.findByCardId("1")),
                                  Card(2, "Test card 2", "Block 2", pricesModel.findByCardId("2")))
     def delete(id: CardModelKey) {}

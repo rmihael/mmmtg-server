@@ -14,7 +14,8 @@ import play.api.libs.json._
 import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
 import stubs.{TestCardModelComponentImpl, TestPricesModelComponentImpl}
 
-class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelComponentImpl with TestPricesModelComponentImpl with Specification {
+class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelComponentImpl
+                             with TestPricesModelComponentImpl with Specification {
   val cardModel = new CardModelImpl
   val pricesModel = new PricesModelImpl
   val cardsService = new CardsServiceImpl
@@ -41,6 +42,34 @@ class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelCo
           ) => success
           case _ => failure("Wrong JSON structure: %s".format(contentAsString(result)))
         }
+      }
+    }
+
+    "find card by block and name" in {
+      running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
+        val result = cardsService.findByName("Force of Will", "Alliances")(FakeRequest())
+        status(result) must equalTo(OK)
+        contentType(result) must beSome("application/json")
+        charset(result) must beSome("utf-8")
+        val resultJson = Json.parse(contentAsString(result))
+        resultJson match {
+          case JsObject(Seq(("id", JsNumber(_)), ("name", JsString(name)), ("block", JsString(_)), ("prices", JsObject(_)))) => name must equalTo("Force of Will")
+          case _ => failure("Wrong JSON structure")
+        }
+      }
+    }
+
+    "give 404 for unknown card name" in {
+      running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
+        val result = cardsService.findByName("No Card", "Alliances")(FakeRequest())
+        status(result) must equalTo(NOT_FOUND)
+      }
+    }
+
+    "give 404 for unknown card id" in {
+      running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
+        val result = cardsService.findById("0")(FakeRequest())
+        status(result) must equalTo(NOT_FOUND)
       }
     }
 
