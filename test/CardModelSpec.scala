@@ -5,7 +5,6 @@
  * Time: 8:58 PM
  */
 
-import org.scala_tools.time.Imports._
 import org.specs2.mutable._
 
 import play.api.test.FakeApplication
@@ -24,6 +23,12 @@ class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponent
         val currentCount = cardModel.findAll.size
         cardModel.create("Force or Will", "Alliances")
         cardModel.findAll must have size currentCount+1
+      }
+    }
+
+    "have no prices after creating" in {
+      running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
+        cardModel.create("Force or Will", "Alliances").get.prices must be empty
       }
     }
   }

@@ -23,5 +23,15 @@ class PriceModelSpec extends PricesModelComponentImpl with Specification {
         pricesModel.findByCardId("1") must have size currentCount+1
       }
     }
+
+    "sorted by datetime" in {
+      running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
+        val now = DateTime.now
+        pricesModel.appendToCard("1", now, 1.0)
+        pricesModel.appendToCard("1", now.minusHours(1), 2.0)
+        pricesModel.appendToCard("1", now.minusHours(2), 1.0)
+        pricesModel.findByCardId("1").unzip._1 must be equalTo(Seq(now.minusHours(2), now.minusHours(1), now))
+      }
+    }
   }
 }
