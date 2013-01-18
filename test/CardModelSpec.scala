@@ -31,5 +31,17 @@ class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponent
         cardModel.create("Force or Will", "Alliances").get.prices must be empty
       }
     }
+
+    "find card by set and card name" in {
+      running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
+        val card = cardModel.create("Test Card", "Alliances").get
+        cardModel.findByNameAndBlock("Test Card", "Alliances") must beSome.which { foundCard =>
+          foundCard match {
+            case Card(card.id, card.name, card.block, _) => true
+            case _ => false
+          }
+        }
+      }
+    }
   }
 }

@@ -39,6 +39,7 @@ trait CardModelComponent {
 
   trait CardModel {
     def findById(id: CardModelKey): Option[Card]
+    def findByNameAndBlock(name: String, block: String): Option[Card]
     def findAll: Seq[Card]
     def delete(id: CardModelKey)
     def create(name: String, block: String): Option[Card]
@@ -82,6 +83,16 @@ trait CardModelComponentImpl extends CardModelComponent {
       DB.withConnection { implicit connection =>
         SQL("SELECT cards.id, cards.name, blocks.name FROM cards JOIN blocks ON cards.block_id = blocks.id WHERE id = {id}").on(
           'id -> id
+        ).as(simple.singleOpt)
+      }
+    }
+
+    def findByNameAndBlock(name: String, block: String): Option[Card] = {
+      DB.withConnection { implicit connection =>
+        SQL(
+          """SELECT cards.id, cards.name, blocks.name FROM cards JOIN blocks ON cards.block_id = blocks.id
+             WHERE cards.name = {cardname} AND blocks.name = {blockname}""").on(
+          'cardname -> name, 'blockname -> block
         ).as(simple.singleOpt)
       }
     }
