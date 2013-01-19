@@ -12,7 +12,7 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
 import com.grumpycats.mmmtg.models.CardModelComponentImpl
-import stubs.TestPricesModelComponentImpl
+import com.grumpycats.mmmtg.models.stubs.TestPricesModelComponentImpl
 
 class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponentImpl with Specification with DataTables {
   val cardModel = new CardModelImpl

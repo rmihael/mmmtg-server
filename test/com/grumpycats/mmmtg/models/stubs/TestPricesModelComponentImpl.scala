@@ -5,7 +5,7 @@
  * Time: 3:24 AM
  */
 
-package stubs
+package com.grumpycats.mmmtg.models.stubs
 
 import org.scala_tools.time.Imports._
 

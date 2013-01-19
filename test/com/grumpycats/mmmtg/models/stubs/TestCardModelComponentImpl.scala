@@ -5,7 +5,7 @@
  * Time: 3:23 AM
  */
 
-package stubs
+package com.grumpycats.mmmtg.models.stubs
 
 import play.api.libs.json._
 
