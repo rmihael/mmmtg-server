@@ -9,8 +9,6 @@ package com.grumpycats.mmmtg.models
 
 import anorm._
 import anorm.SqlParser._
-import play.api.db._
-import play.api.Play.current
 import org.scala_tools.time.Imports._
 
 trait PricesModelComponent {
@@ -27,6 +25,8 @@ trait PricesModelComponent {
 }
 
 trait PricesModelComponentImpl extends PricesModelComponent {
+  this: DBProviderComponent =>
+
   type PricesModelKey = Pk[Long]
 
   implicit def String2PricesModelKey(value: String): PricesModelKey = Id(Integer.parseInt(value))

@@ -7,8 +7,6 @@
 
 package com.grumpycats.mmmtg.models.stubs
 
-import play.api.libs.json._
-
 import com.grumpycats.mmmtg.models.{PricesModelComponent, CardModelComponent}
 
 trait TestCardModelComponentImpl extends CardModelComponent {
@@ -16,11 +14,8 @@ trait TestCardModelComponentImpl extends CardModelComponent {
 
   type CardModelKey = Int
 
-  implicit object Key extends Writes[CardModelKey] {
-    def writes(key: CardModelKey) = { JsNumber(key) }
-  }
-
   implicit def String2CardModelKey(value: String) = Integer.parseInt(value)
+  implicit def CardModelKey2String(key: CardModelKey): String = "%s".format(key)
 
   class CardModelImpl extends CardModel {
     def findById(id: CardModelKey): Option[Card] = id match {

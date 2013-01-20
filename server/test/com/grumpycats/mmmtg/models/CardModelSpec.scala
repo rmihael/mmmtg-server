@@ -7,16 +7,21 @@
 
 import org.specs2.matcher.DataTables
 import org.specs2.mutable._
-
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
 import com.grumpycats.mmmtg.models.CardModelComponentImpl
+import com.grumpycats.mmmtg.PlayDBProviderComponent
 import com.grumpycats.mmmtg.models.stubs.TestPricesModelComponentImpl
 
-class CardModelSpec extends CardModelComponentImpl with TestPricesModelComponentImpl with Specification with DataTables {
+class CardModelSpec extends
+      CardModelComponentImpl with
+      TestPricesModelComponentImpl with
+      PlayDBProviderComponent with
+      Specification with DataTables {
   val cardModel = new CardModelImpl
   val pricesModel = new PricesModelImpl
+  val DB = new DBProviderImpl
 
   "The card model" should {
     "be persisted" in {

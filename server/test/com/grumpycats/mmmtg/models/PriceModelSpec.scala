@@ -5,16 +5,21 @@
  * Time: 9:28 PM
  */
 
+import org.scala_tools.time.Imports._
 import org.specs2.mutable._
-
 import play.api.test._
 import play.api.test.Helpers._
-import org.scala_tools.time.Imports._
 
 import com.grumpycats.mmmtg.models.PricesModelComponentImpl
+import com.grumpycats.mmmtg.PlayDBProviderComponent
 
-class PriceModelSpec extends PricesModelComponentImpl with Specification {
+class PriceModelSpec extends
+      PricesModelComponentImpl with
+      PlayDBProviderComponent with
+      Specification {
   val pricesModel = new PricesModelImpl
+  val DB = new DBProviderImpl
+
   "The prices model" should {
     "be persisted" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {

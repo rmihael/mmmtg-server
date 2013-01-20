@@ -20,6 +20,7 @@ object Resolvers {
 }
 
 object Dependencies {
+  val anorm = "play" %% "anorm" % play.core.PlayVersion.current
   val jodaTime = "org.scalaj" %% "scalaj-time" % "0.6"
   val akkaHttp = "com.typesafe.akka" % "akka-actor" % "2.0.5"
   val playFramework = "play" %% "play" % play.core.PlayVersion.current
@@ -32,11 +33,11 @@ object ApplicationBuild extends Build {
   override def settings = super.settings ++ org.sbtidea.SbtIdeaPlugin.ideaSettings ++ globalSettings
 
   val appName         = "mmmtg"
-  val appVersion      = "1.0-SNAPSHOT"
+  val appVersion      = "0.1-SNAPSHOT"
 
   val commons = Project("commons", file("commons"),
                         settings = projectSettings ++
-                                   Seq(libraryDependencies ++= Seq(playFramework, jodaTime))
+                                   Seq(libraryDependencies ++= Seq(anorm, jodaTime))
   )
 
   val server = PlayProject("server", appVersion, Seq(jodaTime), path=file("server"), mainLang=SCALA).settings(

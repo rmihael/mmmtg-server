@@ -9,10 +9,6 @@ package com.grumpycats.mmmtg.models
 
 import anorm._
 import anorm.SqlParser._
-import play.api.db._
-import play.api.libs.json._
-import play.api.Play.current
-import org.scala_tools.time.Imports._
 
 trait CardModelComponent {
   val cardModel: CardModel
@@ -21,18 +17,7 @@ trait CardModelComponent {
   case class Card(id: CardModelKey, name: String, block: String, prices: PricesHistory)
 
   implicit def String2CardModelKey(value: String): CardModelKey
-  implicit val Key: Writes[CardModelKey]
-
-  implicit object dateTimeWriter extends Writes[PricesHistory] {
-    def writes(datetimes: PricesHistory) = JsObject(datetimes map { case (dt, price) => dt.millis.toString -> JsNumber(price)})
-  }
-
-  implicit object cardWriter extends Writes[Card] {
-    def writes(card: Card): JsValue = {
-      Json.toJson(Map("id" -> Json.toJson(card.id), "name" -> Json.toJson(card.name),
-                      "block" -> Json.toJson(card.block), "prices" -> Json.toJson(card.prices)))
-    }
-  }
+  implicit def CardModelKey2String(key: CardModelKey): String
 
   trait CardModel {
     def findById(id: CardModelKey): Option[Card]
@@ -44,15 +29,13 @@ trait CardModelComponent {
 }
 
 trait CardModelComponentImpl extends CardModelComponent {
-  this: PricesModelComponent =>
+  this: PricesModelComponent with DBProviderComponent =>
 
   type CardModelKey = Pk[Long]
   implicit def String2CardModelKey(value: String): CardModelKey = Id(Integer.parseInt(value))
-  implicit object Key extends Writes[CardModelKey] {
-    def writes(key: CardModelKey): JsValue = key match {
-      case Id(idVal: Long) => JsNumber(idVal)
-      case _ => JsNull
-    }
+  implicit def CardModelKey2String(key: CardModelKey): String = key match {
+    case Id(value) => "%s".format(value)
+    case _ => ""
   }
 
   class CardModelImpl extends CardModel {

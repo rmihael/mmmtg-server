@@ -7,25 +7,35 @@
 
 package com.grumpycats.mmmtg.controllers
 
-import play.api._
-import mvc._
+import play.api.mvc._
 import play.api.libs.json._
+import org.scala_tools.time.Imports._
 
 import com.grumpycats.mmmtg.models._
-import anorm.{Id, Pk}
 
-trait CardsServiceComponent {
+trait CardsServiceComponent extends CardModelComponent {
   val cardsService: CardsService
 
   trait CardsService extends Controller {
     def index: Action[AnyContent]
     def create: Action[JsValue]
+    def findByName(name: String, block: String): Action[AnyContent]
+    def findById(id: String): Action[AnyContent]
+  }
+
+  implicit object dateTimeWriter extends Writes[PricesHistory] {
+    def writes(datetimes: PricesHistory) = JsObject(datetimes map { case (dt, price) => dt.millis.toString -> JsNumber(price) })
+  }
+
+  implicit object cardWriter extends Writes[Card] {
+    def writes(card: Card): JsValue = {
+      Json.toJson(Map("id" -> JsString(card.id), "name" -> Json.toJson(card.name),
+        "block" -> Json.toJson(card.block), "prices" -> Json.toJson(card.prices)))
+    }
   }
 }
 
 trait CardsServiceComponentImpl extends CardsServiceComponent {
-  this: CardModelComponent =>
-
   class CardsServiceImpl extends CardsService {
     def index = Action { request => Ok(Json.toJson(Map("cards" -> cardModel.findAll))) }
 
