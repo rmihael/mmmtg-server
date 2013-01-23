@@ -12,15 +12,13 @@ import anorm.SqlParser._
 import org.scala_tools.time.Imports._
 
 trait PricesModelComponent {
-  type PricesModelKey
-
-  implicit def String2PricesModelKey(value: String): PricesModelKey
-
   val pricesModel: PricesModel
 
+  type PricesModelKey
+
   trait PricesModel {
-    def findByCardId(card_id: PricesModelKey): PricesHistory
-    def appendToCard(card_id: PricesModelKey, datetime: DateTime, price: Double)
+    def findByCardId(card_id: String): PricesHistory
+    def appendToCard(card_id: String, datetime: DateTime, price: Double)
   }
 }
 
@@ -28,8 +26,6 @@ trait PricesModelComponentImpl extends PricesModelComponent {
   this: DBProviderComponent =>
 
   type PricesModelKey = Pk[Long]
-
-  implicit def String2PricesModelKey(value: String): PricesModelKey = Id(Integer.parseInt(value))
 
   class PricesModelImpl extends PricesModel {
     /**
@@ -41,14 +37,14 @@ trait PricesModelComponentImpl extends PricesModelComponent {
         case tstamp~price => new DateTime(tstamp) -> price
       }
 
-    def findByCardId(card_id: PricesModelKey): PricesHistory = {
+    def findByCardId(card_id: String): PricesHistory = {
       DB.withConnection { implicit connection =>
         SQL("SELECT dt, price FROM prices WHERE card_id = {card_id} ORDER BY dt ASC")
           .on("card_id" -> card_id).as(simple *)
       }
     }
 
-    def appendToCard(card_id: PricesModelKey, datetime: DateTime, price: Double) {
+    def appendToCard(card_id: String, datetime: DateTime, price: Double) {
       DB.withConnection { implicit connection =>
         SQL("INSERT INTO prices(card_id, dt, price) VALUES ({card_id}, {dt}, {price})")
           .on("card_id" -> card_id, "dt" -> datetime.millis, "price" -> price).executeInsert()

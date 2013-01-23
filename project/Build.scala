@@ -24,6 +24,7 @@ object Dependencies {
   val jodaTime = "org.scalaj" %% "scalaj-time" % "0.6"
   val akkaHttp = "com.typesafe.akka" % "akka-actor" % "2.0.5"
   val playFramework = "play" %% "play" % play.core.PlayVersion.current
+  val validators = "commons-validator" % "commons-validator" % "1.4.0"
 }
 
 object ApplicationBuild extends Build {
@@ -37,7 +38,7 @@ object ApplicationBuild extends Build {
 
   val commons = Project("commons", file("commons"),
                         settings = projectSettings ++
-                                   Seq(libraryDependencies ++= Seq(anorm, jodaTime))
+                                   Seq(libraryDependencies ++= Seq(anorm, jodaTime, validators))
   )
 
   val server = PlayProject("server", appVersion, Seq(jodaTime), path=file("server"), mainLang=SCALA).settings(

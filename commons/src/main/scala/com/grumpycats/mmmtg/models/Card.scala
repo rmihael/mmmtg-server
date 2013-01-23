@@ -14,12 +14,15 @@ trait CardModelComponent {
   val cardModel: CardModel
 
   type CardModelKey
+
   case class Card(id: CardModelKey, name: String, block: String, prices: PricesHistory)
 
   implicit def String2CardModelKey(value: String): CardModelKey
   implicit def CardModelKey2String(key: CardModelKey): String
 
   trait CardModel {
+    type Key = CardModelKey
+
     def findById(id: CardModelKey): Option[Card]
     def findByNameAndBlock(name: String, block: String): Option[Card]
     def findAll: Seq[Card]
@@ -39,13 +42,11 @@ trait CardModelComponentImpl extends CardModelComponent {
   }
 
   class CardModelImpl extends CardModel {
-    // -- Parsers
-
     /**
      * Parse a Card from a ResultSet
      */
     private val simple =
-      get[Pk[Long]]("cards.id") ~
+      get[CardModelKey]("cards.id") ~
       get[String]("cards.name") ~
       get[String]("blocks.name") map {
         case id~name~block => Card(id, name, block, pricesModel.findByCardId(id.toString))

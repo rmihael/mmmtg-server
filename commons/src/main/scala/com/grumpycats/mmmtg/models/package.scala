@@ -11,4 +11,9 @@ import org.scala_tools.time.Imports._
 
 package object models {
   type PricesHistory = Seq[(DateTime, Double)]
+
+  object PriceSourceType extends Enumeration {
+    type PriceSourceType = Value
+    val StarCity = Value
+  }
 }

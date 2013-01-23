@@ -17,7 +17,7 @@ trait TestPricesModelComponentImpl extends PricesModelComponent {
   implicit def String2PricesModelKey(value: String): PricesModelKey = Integer.parseInt(value)
 
   class PricesModelImpl extends PricesModel {
-    def findByCardId(card_id: PricesModelKey) = Seq(new DateTime(2005, 3, 26, 12, 0, 0, 0) -> 1.0)
-    def appendToCard(card_id: PricesModelKey, datetime: DateTime, price: Double) {}
+    def findByCardId(card_id: String) = Seq(new DateTime(2005, 3, 26, 12, 0, 0, 0) -> 1.0)
+    def appendToCard(card_id: String, datetime: DateTime, price: Double) {}
   }
 }
