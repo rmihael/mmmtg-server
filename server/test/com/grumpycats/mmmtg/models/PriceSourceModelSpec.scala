@@ -40,7 +40,7 @@ class PriceSourceModelSpec extends PriceSourceModelComponentImpl
         priceSourceModel.setForCard("1", PriceSourceType.StarCity, "http://some.other.cool.site.com/some/path")
         val results = priceSourceModel.findByCardId("1")
         results must have size 1
-        results(0).url must equalTo("http://some.other.cool.site.com/some/path")
+        results(PriceSourceType.StarCity) must equalTo("http://some.other.cool.site.com/some/path")
       }
     }
   }

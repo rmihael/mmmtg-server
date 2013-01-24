@@ -11,7 +11,6 @@ import anorm._
 import anorm.SqlParser._
 
 import PriceSourceType._
-import java.net.URL
 import org.apache.commons.validator.routines.UrlValidator
 
 trait PriceSourceModelComponent {
@@ -19,11 +18,9 @@ trait PriceSourceModelComponent {
 
   type PriceSourceModelKey
 
-  case class PriceSource(id: PriceSourceModelKey, card_id: String, source_type: PriceSourceType, url: String)
-
   trait PriceSourceModel {
-    def findByCardId(cardId: String): Seq[PriceSource]
-    def setForCard(cardId: String, sourceType: PriceSourceType, url: String): Option[PriceSource]
+    def findByCardId(cardId: String): Map[PriceSourceType, String]
+    def setForCard(cardId: String, sourceType: PriceSourceType, url: String): Option[String]
   }
 }
 
@@ -34,21 +31,20 @@ trait PriceSourceModelComponentImpl extends PriceSourceModelComponent {
 
   class PriceSourceModelImpl extends PriceSourceModel {
     private val simple =
-      get[PriceSourceModelKey]("pricesources.id") ~
       get[String]("pricesources.type") ~
       get[String]("pricesources.url") map {
-        case id~sourceType~url => (id, PriceSourceType.withName(sourceType), url)
+        case sourceType~url => (PriceSourceType.withName(sourceType), url)
       }
 
-    def findByCardId(cardId: String): Seq[PriceSource] = {
+    def findByCardId(cardId: String): Map[PriceSourceType, String] = {
       DB.withConnection { implicit connection =>
-        SQL("SELECT id, type, url FROM pricesources WHERE card_id = {card_id}")
-          .on("card_id" -> Integer.parseInt(cardId)).as(simple *)
-          .map {case (id, sourceType, url) => PriceSource(id, cardId, sourceType, url)}
+        val dbResult = SQL("SELECT type, url FROM pricesources WHERE card_id = {card_id}")
+                       .on("card_id" -> Integer.parseInt(cardId)).as(simple *)
+        Map(dbResult : _*)
       }
     }
 
-    def setForCard(cardId: String, sourceType: PriceSourceType, url: String): Option[PriceSource] = {
+    def setForCard(cardId: String, sourceType: PriceSourceType, url: String): Option[String] = {
       (new UrlValidator(Seq("http", "https").toArray)).isValid(url) match {
         case true => {
           val parsedCardId = Integer.parseInt(cardId)
@@ -59,7 +55,7 @@ trait PriceSourceModelComponentImpl extends PriceSourceModelComponent {
                  WHERE NOT EXISTS (SELECT 1 FROM pricesources WHERE card_id={card_id} AND type={type})""")
             .on("card_id" -> parsedCardId, "type" -> sourceType.toString, "url" -> url).executeInsert()
           }
-          id.map {someId => PriceSource(Id(someId), cardId, sourceType, url)}
+          id map {someId => url}
         }
         case otherwise => None
       }

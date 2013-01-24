@@ -10,12 +10,15 @@ package com.grumpycats.mmmtg.models
 import anorm._
 import anorm.SqlParser._
 
+import PriceSourceType._
+
 trait CardModelComponent {
   val cardModel: CardModel
 
   type CardModelKey
 
-  case class Card(id: CardModelKey, name: String, block: String, prices: PricesHistory)
+  case class Card(id: CardModelKey, name: String, block: String,
+                  prices: PricesHistory, sources: Map[PriceSourceType, String])
 
   implicit def String2CardModelKey(value: String): CardModelKey
   implicit def CardModelKey2String(key: CardModelKey): String
@@ -32,7 +35,7 @@ trait CardModelComponent {
 }
 
 trait CardModelComponentImpl extends CardModelComponent {
-  this: PricesModelComponent with DBProviderComponent =>
+  this: PricesModelComponent with PriceSourceModelComponent with DBProviderComponent =>
 
   type CardModelKey = Pk[Long]
   implicit def String2CardModelKey(value: String): CardModelKey = Id(Integer.parseInt(value))
@@ -49,7 +52,8 @@ trait CardModelComponentImpl extends CardModelComponent {
       get[CardModelKey]("cards.id") ~
       get[String]("cards.name") ~
       get[String]("blocks.name") map {
-        case id~name~block => Card(id, name, block, pricesModel.findByCardId(id.toString))
+        case id~name~block => Card(id, name, block, pricesModel.findByCardId(id.toString),
+                                   priceSourceModel.findByCardId(id.toString))
       }
 
     // -- Queries
@@ -106,7 +110,7 @@ trait CardModelComponentImpl extends CardModelComponent {
           """insert into cards(name, block_id) values
              ({name}, (SELECT id from blocks WHERE lower(name)=lower({block}) OR lower(shortname)=lower({block})))""")
           .on("name" -> name, "block" -> block).executeInsert()
-        id.map {someId => Card(Id(someId), name, block, Seq())}
+        id.map {someId => Card(Id(someId), name, block, Seq(), Map())}
       }
     }
   }

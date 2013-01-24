@@ -12,16 +12,18 @@ import play.api.test.Helpers._
 
 import com.grumpycats.mmmtg.models.CardModelComponentImpl
 import com.grumpycats.mmmtg.PlayDBProviderComponent
-import com.grumpycats.mmmtg.models.stubs.TestPricesModelComponentImpl
+import com.grumpycats.mmmtg.models.stubs.{TestPriceSourceModelComponentImpl, TestPricesModelComponentImpl}
 
 class CardModelSpec extends
       CardModelComponentImpl with
       TestPricesModelComponentImpl with
+      TestPriceSourceModelComponentImpl with
       PlayDBProviderComponent with
       Specification with DataTables {
   val cardModel = new CardModelImpl
   val pricesModel = new PricesModelImpl
   val DB = new DBProviderImpl
+  val priceSourceModel = new PriceSourceModelImpl
 
   "The card model" should {
     "be persisted" in {
@@ -52,7 +54,7 @@ class CardModelSpec extends
           cardModel.delete(card.id)
           result must beSome.which { foundCard =>
             foundCard match {
-              case Card(card.id, card.name, card.block, _) => true
+              case Card(card.id, card.name, card.block, _, _) => true
               case _ => false
             }
           }

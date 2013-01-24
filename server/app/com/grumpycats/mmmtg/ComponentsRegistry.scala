@@ -8,11 +8,12 @@ package com.grumpycats.mmmtg
  */
 
 import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
-import com.grumpycats.mmmtg.models.{CardModelComponentImpl, PricesModelComponentImpl}
+import models.{PriceSourceModelComponentImpl, CardModelComponentImpl, PricesModelComponentImpl}
 
 object ComponentsRegistry extends
 CardModelComponentImpl with
 PricesModelComponentImpl with
+PriceSourceModelComponentImpl with
 CardsServiceComponentImpl with
 PlayDBProviderComponent {
 
@@ -20,4 +21,5 @@ PlayDBProviderComponent {
   val pricesModel = new PricesModelImpl
   val cardsService = new CardsServiceImpl
   val DB = new DBProviderImpl
+  val priceSourceModel = new PriceSourceModelImpl
 }

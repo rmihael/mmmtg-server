@@ -12,13 +12,14 @@ import play.api.test.Helpers._
 import play.api.libs.json._
 
 import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
-import com.grumpycats.mmmtg.models.stubs.{TestCardModelComponentImpl, TestPricesModelComponentImpl}
+import com.grumpycats.mmmtg.models.stubs._
 
 class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelComponentImpl
-                             with TestPricesModelComponentImpl with Specification {
+                             with TestPricesModelComponentImpl with TestPriceSourceModelComponentImpl with Specification {
   val cardModel = new CardModelImpl
   val pricesModel = new PricesModelImpl
   val cardsService = new CardsServiceImpl
+  val priceSourceModel = new PriceSourceModelImpl
 
   "The Cards controller" should {
     "answer to index call" in {
