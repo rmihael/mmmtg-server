@@ -23,6 +23,7 @@ trait CardModelComponent {
     def findAll: Seq[Card]
     def delete(id: String)
     def create(name: String, block: String): Option[Card]
+    def setPriceSource(id: String, sourceType: PriceSourceType, url: String): Option[String]
   }
 }
 

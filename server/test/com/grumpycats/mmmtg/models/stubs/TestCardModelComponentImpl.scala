@@ -7,7 +7,9 @@
 
 package com.grumpycats.mmmtg.models.stubs
 
-import com.grumpycats.mmmtg.models.{Card, PriceSourceModelComponent, PricesModelComponent, CardModelComponent}
+import com.grumpycats.mmmtg.models.{PriceSourceModelComponent, PricesModelComponent, CardModelComponent}
+import com.grumpycats.mmmtg.models.PriceSourceType._
+import com.grumpycats.mmmtg.models.Card
 
 trait TestCardModelComponentImpl extends CardModelComponent {
   this: PricesModelComponent with PriceSourceModelComponent =>
@@ -25,5 +27,6 @@ trait TestCardModelComponentImpl extends CardModelComponent {
                                  Card("2", "Test card 2", "Block 2", pricesModel.findByCardId("2"), priceSourceModel.findByCardId("2")))
     def delete(id: String) {}
     def create(name: String, block: String): Option[Card] = Some(Card("1", name, block, Seq(), priceSourceModel.findByCardId("1")))
+    def setPriceSource(id: String, sourceType: PriceSourceType, url: String) = priceSourceModel.setForCard(id, sourceType, url)
   }
 }

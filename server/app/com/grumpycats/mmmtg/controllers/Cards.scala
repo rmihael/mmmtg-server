@@ -10,9 +10,14 @@ package com.grumpycats.mmmtg.controllers
 import play.api.mvc._
 import play.api.libs.json._
 import org.scala_tools.time.Imports._
+import play.api.libs.concurrent.Akka
+import play.api.Play.current
 
 import com.grumpycats.mmmtg.models._
 import com.grumpycats.mmmtg.matchers.CardsMatcherComponent
+import akka.actor.{Props, Actor}
+import concurrent.ExecutionContext
+import scala.util.{Success, Failure}
 
 trait CardsService extends Controller {
   def index: Action[AnyContent]
@@ -48,7 +53,10 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
         block <- (request.body \ "block").asOpt[String]
         card <- cardModel.create(name, block)
       } yield card
-      maybeCard map {card => Ok(Json.toJson(card))} getOrElse(BadRequest(Json.toJson(Map("message" -> "some shit happened"))))
+      maybeCard map { card =>
+        Akka.system.actorOf(Props(new MatcherActor)) ! card
+        Ok(Json.toJson(card))
+      } getOrElse(BadRequest(Json.toJson(Map("message" -> "some shit happened"))))
     }
 
     def findByName(name: String, block: String) = Action {
@@ -57,6 +65,22 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
 
     def findById(id: String) = Action {
       cardModel.findById(id) map {card => Ok(Json.toJson(card))} getOrElse(NotFound)
+    }
+  }
+
+  class MatcherActor extends Actor {
+    implicit val executionContext: ExecutionContext = Akka.system.dispatcher
+    def receive = {
+      case card: Card => {
+        //hello kote!
+        cardsMatcher.matchCard(card) onComplete {
+          case Success(Some(url)) => {
+            cardModel.setPriceSource(card.id, cardsMatcher.priceSource, url)
+          }
+          case Success(None) => null
+          case Failure(failure) => null
+        }
+      }
     }
   }
 }
