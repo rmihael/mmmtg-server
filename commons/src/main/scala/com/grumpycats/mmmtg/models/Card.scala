@@ -12,6 +12,8 @@ import scala.language.postfixOps
 import anorm._
 import anorm.SqlParser._
 
+import com.grumpycats.mmmtg.models.PriceSourceType._
+
 trait CardModelComponent {
   val cardModel: CardModel
 
@@ -96,5 +98,7 @@ trait CardModelComponentImpl extends CardModelComponent {
         id.map {someId => Card(someId.toString, name, block, Seq(), Map())}
       }
     }
+
+    def setPriceSource(id: String, sourceType: PriceSourceType, url: String) = priceSourceModel.setForCard(id, sourceType, url)
   }
 }

@@ -7,10 +7,11 @@ package com.grumpycats.mmmtg
  * Time: 6:00 PM
  */
 
+import play.api.Play
+
 import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
 import com.grumpycats.mmmtg.models.{PriceSourceModelComponentImpl, PricesModelComponentImpl, CardModelComponentImpl}
-import matchers.{GoogleCardSearchApiComponentImpl, StarcityMatcherComponentImpl, CardsMatcherComponent}
-import play.api.Play
+import com.grumpycats.mmmtg.matchers.{GoogleCardSearchApiComponentImpl, StarcityMatcherComponentImpl}
 
 object ComponentsRegistry extends
 CardModelComponentImpl with

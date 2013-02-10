@@ -6,10 +6,12 @@
  */
 
 import org.specs2.matcher.DataTables
+import org.specs2.mock.Mockito
 import org.specs2.mutable._
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
+import com.grumpycats.mmmtg.models.PriceSourceType
 import com.grumpycats.mmmtg.models.{Card, CardModelComponentImpl}
 import com.grumpycats.mmmtg.PlayDBProviderComponentImpl
 import com.grumpycats.mmmtg.models.stubs.{TestPriceSourceModelComponentImpl, TestPricesModelComponentImpl}
@@ -19,11 +21,11 @@ class CardModelSpec extends
       TestPricesModelComponentImpl with
       TestPriceSourceModelComponentImpl with
       PlayDBProviderComponentImpl with
-      Specification with DataTables {
+      Specification with DataTables with Mockito {
   val cardModel = new CardModelImpl
   val pricesModel = new PricesModelImpl
   val DB = new DBProviderImpl
-  val priceSourceModel = new PriceSourceModelImpl
+  val priceSourceModel = spy(new PriceSourceModelImpl)
 
   "The card model" should {
     "be persisted" in {
@@ -59,6 +61,13 @@ class CardModelSpec extends
             }
           }
         }
+      }
+    }
+
+    "delegate setting price source to PriceSourceModelComponent" in {
+      running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
+        cardModel.setPriceSource("1", PriceSourceType.StarCity, "http://some.url.com/some/path")
+        there was one(priceSourceModel).setForCard("1", PriceSourceType.StarCity, "http://some.url.com/some/path")
       }
     }
   }

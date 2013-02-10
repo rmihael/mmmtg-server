@@ -21,7 +21,6 @@ object BuildSettings {
 object Resolvers {
   val typesafeRepo = "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
   val projectRepo = Resolver.file("project-repo", file("localrepo"))(Resolver.ivyStylePatterns)
-
 }
 
 object Dependencies {
