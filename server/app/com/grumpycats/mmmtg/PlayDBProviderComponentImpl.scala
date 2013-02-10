@@ -12,7 +12,7 @@ import play.api.Play.current
 
 import com.grumpycats.mmmtg.models.DBProviderComponent
 
-trait PlayDBProviderComponent extends DBProviderComponent {
+trait PlayDBProviderComponentImpl extends DBProviderComponent {
   class DBProviderImpl extends DBProvider {
     def withConnection[A](block: Connection => A): A = play.api.db.DB.withConnection(block)
   }

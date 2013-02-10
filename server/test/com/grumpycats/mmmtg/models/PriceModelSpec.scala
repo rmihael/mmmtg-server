@@ -11,11 +11,11 @@ import play.api.test._
 import play.api.test.Helpers._
 
 import com.grumpycats.mmmtg.models.PricesModelComponentImpl
-import com.grumpycats.mmmtg.PlayDBProviderComponent
+import com.grumpycats.mmmtg.PlayDBProviderComponentImpl
 
 class PriceModelSpec extends
       PricesModelComponentImpl with
-      PlayDBProviderComponent with
+      PlayDBProviderComponentImpl with
       Specification {
   val pricesModel = new PricesModelImpl
   val DB = new DBProviderImpl

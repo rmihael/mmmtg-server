@@ -10,15 +10,15 @@ import org.specs2.mutable._
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
-import com.grumpycats.mmmtg.models.CardModelComponentImpl
-import com.grumpycats.mmmtg.PlayDBProviderComponent
+import com.grumpycats.mmmtg.models.{Card, CardModelComponentImpl}
+import com.grumpycats.mmmtg.PlayDBProviderComponentImpl
 import com.grumpycats.mmmtg.models.stubs.{TestPriceSourceModelComponentImpl, TestPricesModelComponentImpl}
 
 class CardModelSpec extends
       CardModelComponentImpl with
       TestPricesModelComponentImpl with
       TestPriceSourceModelComponentImpl with
-      PlayDBProviderComponent with
+      PlayDBProviderComponentImpl with
       Specification with DataTables {
   val cardModel = new CardModelImpl
   val pricesModel = new PricesModelImpl

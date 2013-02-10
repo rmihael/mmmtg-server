@@ -16,4 +16,8 @@ package object models {
     type PriceSourceType = Value
     val StarCity = Value
   }
+
+  case class Card(id: String, name: String, block: String, prices: PricesHistory,
+                  sources: Map[PriceSourceType.PriceSourceType, String])
+
 }

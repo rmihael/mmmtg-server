@@ -7,6 +7,8 @@
 
 package com.grumpycats.mmmtg.models
 
+import scala.language.postfixOps
+
 import anorm._
 import anorm.SqlParser._
 
@@ -38,9 +40,8 @@ trait PriceSourceModelComponentImpl extends PriceSourceModelComponent {
 
     def findByCardId(cardId: String): Map[PriceSourceType, String] = {
       DB.withConnection { implicit connection =>
-        val dbResult = SQL("SELECT type, url FROM pricesources WHERE card_id = {card_id}")
-                       .on("card_id" -> Integer.parseInt(cardId)).as(simple *)
-        Map(dbResult : _*)
+        SQL("SELECT type, url FROM pricesources WHERE card_id = {card_id}")
+          .on("card_id" -> Integer.parseInt(cardId)).as(simple *).toMap
       }
     }
 

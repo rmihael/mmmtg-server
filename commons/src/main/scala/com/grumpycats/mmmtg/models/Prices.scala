@@ -7,6 +7,8 @@
 
 package com.grumpycats.mmmtg.models
 
+import scala.language.postfixOps
+
 import anorm._
 import anorm.SqlParser._
 import org.scala_tools.time.Imports._

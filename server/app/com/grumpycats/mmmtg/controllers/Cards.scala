@@ -12,16 +12,17 @@ import play.api.libs.json._
 import org.scala_tools.time.Imports._
 
 import com.grumpycats.mmmtg.models._
+import com.grumpycats.mmmtg.matchers.CardsMatcherComponent
 
-trait CardsServiceComponent extends CardModelComponent {
+trait CardsService extends Controller {
+  def index: Action[AnyContent]
+  def create: Action[JsValue]
+  def findByName(name: String, block: String): Action[AnyContent]
+  def findById(id: String): Action[AnyContent]
+}
+
+trait CardsServiceComponent {
   val cardsService: CardsService
-
-  trait CardsService extends Controller {
-    def index: Action[AnyContent]
-    def create: Action[JsValue]
-    def findByName(name: String, block: String): Action[AnyContent]
-    def findById(id: String): Action[AnyContent]
-  }
 
   implicit object dateTimeWriter extends Writes[PricesHistory] {
     def writes(datetimes: PricesHistory) = JsObject(datetimes map { case (dt, price) => dt.millis.toString -> JsNumber(price) })
@@ -36,6 +37,8 @@ trait CardsServiceComponent extends CardModelComponent {
 }
 
 trait CardsServiceComponentImpl extends CardsServiceComponent {
+  this: CardModelComponent with CardsMatcherComponent =>
+
   class CardsServiceImpl extends CardsService {
     def index = Action { request => Ok(Json.toJson(Map("cards" -> cardModel.findAll))) }
 
@@ -45,24 +48,15 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
         block <- (request.body \ "block").asOpt[String]
         card <- cardModel.create(name, block)
       } yield card
-      maybeCard match {
-        case Some(card) => Ok(Json.toJson(card))
-        case None => BadRequest(Json.toJson(Map("message" -> "some shit happened")))
-      }
+      maybeCard map {card => Ok(Json.toJson(card))} getOrElse(BadRequest(Json.toJson(Map("message" -> "some shit happened"))))
     }
 
     def findByName(name: String, block: String) = Action {
-      cardModel.findByNameAndBlock(name, block) match {
-        case Some(card) => Ok(Json.toJson(card))
-        case _ => NotFound
-      }
+      cardModel.findByNameAndBlock(name, block) map {card => Ok(Json.toJson(card))} getOrElse(NotFound)
     }
 
     def findById(id: String) = Action {
-      cardModel.findById(id) match {
-        case Some(card) => Ok(Json.toJson(card))
-        case _ => NotFound
-      }
+      cardModel.findById(id) map {card => Ok(Json.toJson(card))} getOrElse(NotFound)
     }
   }
 }

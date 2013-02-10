@@ -5,6 +5,8 @@
  * Time: 12:11 AM
  */
 
+import com.grumpycats.mmmtg.matchers.StarcityMatcherComponentImpl
+import com.grumpycats.mmmtg.matchers.stubs.TestGoogleCardSearchComponentImpl
 import org.specs2.mutable._
 
 import play.api.test._
@@ -15,11 +17,14 @@ import com.grumpycats.mmmtg.controllers.CardsServiceComponentImpl
 import com.grumpycats.mmmtg.models.stubs._
 
 class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelComponentImpl
-                             with TestPricesModelComponentImpl with TestPriceSourceModelComponentImpl with Specification {
+                             with TestPricesModelComponentImpl with TestPriceSourceModelComponentImpl
+                             with StarcityMatcherComponentImpl with TestGoogleCardSearchComponentImpl with Specification {
   val cardModel = new CardModelImpl
   val pricesModel = new PricesModelImpl
   val cardsService = new CardsServiceImpl
   val priceSourceModel = new PriceSourceModelImpl
+  val cardsMatcher = new CardsMatcherImpl
+  val cardSearchApi = new CardSearchApiImpl
 
   "The Cards controller" should {
     "answer to index call" in {
@@ -77,7 +82,7 @@ class CardsControllerSpec extends CardsServiceComponentImpl with TestCardModelCo
     "answer to create call" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
         val body = Json.parse("""{"name": "Force of Will", "block": "Alliances"}""")
-        val result = cardsService.create(FakeRequest().copy(body=body))
+        val result = cardsService.create(FakeRequest().withBody(body))
         status(result) must equalTo(OK)
         contentType(result) must beSome("application/json")
         charset(result) must beSome("utf-8")

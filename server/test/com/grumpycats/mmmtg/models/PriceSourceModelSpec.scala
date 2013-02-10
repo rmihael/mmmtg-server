@@ -11,10 +11,10 @@ import org.specs2.mutable._
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 
-import com.grumpycats.mmmtg.PlayDBProviderComponent
+import com.grumpycats.mmmtg.PlayDBProviderComponentImpl
 
 class PriceSourceModelSpec extends PriceSourceModelComponentImpl
-                           with PlayDBProviderComponent with Specification {
+                           with PlayDBProviderComponentImpl with Specification {
   val priceSourceModel = new PriceSourceModelImpl
   val DB = new DBProviderImpl
 

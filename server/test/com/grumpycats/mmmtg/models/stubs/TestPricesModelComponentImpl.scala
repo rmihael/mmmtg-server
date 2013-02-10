@@ -7,6 +7,8 @@
 
 package com.grumpycats.mmmtg.models.stubs
 
+import scala.language.implicitConversions
+
 import org.scala_tools.time.Imports._
 
 import com.grumpycats.mmmtg.models.PricesModelComponent
