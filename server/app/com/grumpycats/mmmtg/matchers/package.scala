@@ -17,8 +17,8 @@ package object matchers {
     val cardsMatcher: CardsMatcher
 
     trait CardsMatcher {
-      def matchCard(card: Card)(implicit ec: ExecutionContext): Future[Option[String]]
       val priceSource: PriceSourceType
+      def matchCard(card: Card)(implicit ec: ExecutionContext): Future[Option[String]]
     }
   }
 }

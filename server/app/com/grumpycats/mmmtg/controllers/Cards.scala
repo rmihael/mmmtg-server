@@ -54,7 +54,7 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
         card <- cardModel.create(name, block)
       } yield card
       maybeCard map { card =>
-        Akka.system.actorOf(Props(new MatcherActor)) ! card
+        Akka.system.actorOf(Props(MatcherActor)) ! card
         Ok(Json.toJson(card))
       } getOrElse(BadRequest(Json.toJson(Map("message" -> "some shit happened"))))
     }
@@ -68,7 +68,7 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
     }
   }
 
-  class MatcherActor extends Actor {
+  object MatcherActor extends Actor {
     implicit val executionContext: ExecutionContext = Akka.system.dispatcher
     def receive = {
       case card: Card => {
@@ -83,4 +83,5 @@ trait CardsServiceComponentImpl extends CardsServiceComponent {
       }
     }
   }
+
 }

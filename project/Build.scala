@@ -29,6 +29,7 @@ object Dependencies {
   val mockito = "org.mockito" % "mockito-all" % "1.9.5"
   val jodaTime = "org.scalaj" %% "scalaj-time" % "0.6"
   val uri = "com.github.theon" %% "scala-uri" % "0.3.2"
+  val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % "2.1.0"
 }
 
 object ApplicationBuild extends Build {
@@ -45,7 +46,7 @@ object ApplicationBuild extends Build {
                                    Seq(libraryDependencies ++= Seq(anorm, jodaTime, validators))
   )
 
-  lazy val server = play.Project("server", appVersion, Seq(jodaTime, mockito, jdbc, uri), path=file("server")).settings(
+  lazy val server = play.Project("server", appVersion, Seq(jodaTime, mockito, jdbc, uri, akkaTestKit), path=file("server")).settings(
   ) dependsOn(commons)
 
   lazy val indexer = Project("indexer", file("indexer"),
