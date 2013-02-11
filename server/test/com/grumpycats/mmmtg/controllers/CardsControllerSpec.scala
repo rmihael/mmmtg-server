@@ -30,7 +30,7 @@ class CardsControllerSpec extends Specification with Mockito {
     val cardModel = new CardModelImpl
     val pricesModel = new PricesModelImpl
     val cardsService = new CardsServiceImpl
-    val priceSourceModel = spy(new PriceSourceModelImpl)
+    val priceSourceModel = new PriceSourceModelImpl
     val cardsMatcher = new CardsMatcherImpl
     val cardSearchApi = new CardSearchApiImpl
   }

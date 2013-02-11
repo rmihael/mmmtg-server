@@ -7,26 +7,27 @@
 
 package com.grumpycats.mmmtg.models.stubs
 
-import com.grumpycats.mmmtg.models.{PriceSourceModelComponent, PricesModelComponent, CardModelComponent}
+import com.grumpycats.mmmtg.models.CardModelComponent
 import com.grumpycats.mmmtg.models.PriceSourceType._
 import com.grumpycats.mmmtg.models.Card
 
 trait TestCardModelComponentImpl extends CardModelComponent {
-  this: PricesModelComponent with PriceSourceModelComponent =>
-
   class CardModelImpl extends CardModel {
+    val priceSourceStub = Map(StarCity -> "http://some.url/some/path")
+    val pricesStub = Seq()
+
     def findById(id: String): Option[Card] = id match {
       case "0" => None
-      case _ => Some(Card(id, "Test card", "Block", pricesModel.findByCardId("1"), priceSourceModel.findByCardId("1")))
+      case _ => Some(Card(id, "Test card", "Block", pricesStub, priceSourceStub))
     }
     def findByNameAndBlock(name: String, block: String): Option[Card] = name match {
       case "No Card" => None
-      case _ => Some(Card("1", name, block, pricesModel.findByCardId("1"), priceSourceModel.findByCardId("1")))
+      case _ => Some(Card("1", name, block, pricesStub, priceSourceStub))
     }
-    def findAll: Seq[Card] = Seq(Card("1", "Test card 1", "Block 1", pricesModel.findByCardId("1"), priceSourceModel.findByCardId("1")),
-                                 Card("2", "Test card 2", "Block 2", pricesModel.findByCardId("2"), priceSourceModel.findByCardId("2")))
+    def findAll: Seq[Card] = Seq(Card("1", "Test card 1", "Block 1", pricesStub, priceSourceStub),
+                                 Card("2", "Test card 2", "Block 2", pricesStub, priceSourceStub))
     def delete(id: String) {}
-    def create(name: String, block: String): Option[Card] = Some(Card("1", name, block, Seq(), priceSourceModel.findByCardId("1")))
-    def setPriceSource(id: String, sourceType: PriceSourceType, url: String) = priceSourceModel.setForCard(id, sourceType, url)
+    def create(name: String, block: String): Option[Card] = Some(Card("1", name, block, Seq(), priceSourceStub))
+    def setPriceSource(id: String, sourceType: PriceSourceType, url: String) = Some(url)
   }
 }
