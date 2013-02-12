@@ -57,6 +57,7 @@ object ApplicationBuild extends Build {
 
   lazy val main = Project(appName, file("."),
                      settings = projectSettings ++
-                                Seq(SbtStartScript.stage in Compile := Unit)
+                                Seq(SbtStartScript.stage in Compile := Unit) ++
+                                Seq(testOptions in Test += Tests.Argument("junitxml", "console"))
   ) aggregate(commons, server, indexer)
 }
