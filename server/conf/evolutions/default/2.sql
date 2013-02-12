@@ -3,9 +3,9 @@
 INSERT INTO blocks VALUES(1, 'Revised', 'REV');
 INSERT INTO blocks VALUES(2, 'Alliances', 'AI');
 
-INSERT INTO cards(name, block_id) VALUES ('Force of Will', 1);
-INSERT INTO cards(name, block_id) VALUES ('Underground Sea', 2);
-INSERT INTO cards(name, block_id) VALUES ('Tropical Island', 2);
+INSERT INTO cards(name, block_id) VALUES ('Underground Sea', 1);
+INSERT INTO cards(name, block_id) VALUES ('Tropical Island', 1);
+INSERT INTO cards(name, block_id) VALUES ('Force of Will', 2);
 
 # --- !Downs
 

@@ -13,6 +13,7 @@ import anorm._
 import anorm.SqlParser._
 
 import com.grumpycats.mmmtg.models.PriceSourceType._
+import java.sql.SQLException
 
 trait CardModelComponent {
   val cardModel: CardModel
@@ -92,14 +93,20 @@ trait CardModelComponentImpl extends CardModelComponent {
     def create(name: String, block: String): Option[Card] = {
       DB.withConnection { implicit connection =>
       // Insert the card
-        val id: Option[Long] = SQL(
+        val id: Option[Long] = try {
+        SQL(
           """insert into cards(name, block_id) values
              ({name}, (SELECT id from blocks WHERE lower(name)=lower({block}) OR lower(shortname)=lower({block})))""")
           .on("name" -> name, "block" -> block).executeInsert()
+        } catch {
+          case exc: SQLException if exc.getSQLState == SQL_STATE_UNIQUE_VIOLATION => None
+        }
         id.map {someId => Card(someId.toString, name, block, Seq(), Map())}
       }
     }
 
     def setPriceSource(id: String, sourceType: PriceSourceType, url: String) = priceSourceModel.setForCard(id, sourceType, url)
+
+    private[this] val SQL_STATE_UNIQUE_VIOLATION = "23505"
   }
 }

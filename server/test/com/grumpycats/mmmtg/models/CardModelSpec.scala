@@ -16,29 +16,37 @@ import com.grumpycats.mmmtg.models.{Card, CardModelComponentImpl}
 import com.grumpycats.mmmtg.PlayDBProviderComponentImpl
 import com.grumpycats.mmmtg.models.stubs.{TestPriceSourceModelComponentImpl, TestPricesModelComponentImpl}
 
-class CardModelSpec extends
-      CardModelComponentImpl with
-      TestPricesModelComponentImpl with
-      TestPriceSourceModelComponentImpl with
-      PlayDBProviderComponentImpl with
-      Specification with DataTables with Mockito {
-  val cardModel = new CardModelImpl
-  val pricesModel = new PricesModelImpl
-  val DB = new DBProviderImpl
-  val priceSourceModel = spy(new PriceSourceModelImpl)
+class CardModelSpec extends Specification with DataTables with Mockito {
+  val app = new CardModelComponentImpl with
+    TestPricesModelComponentImpl with
+    TestPriceSourceModelComponentImpl with
+    PlayDBProviderComponentImpl {
+
+    val cardModel = new CardModelImpl
+    val pricesModel = new PricesModelImpl
+    val DB = new DBProviderImpl
+    val priceSourceModel = new PriceSourceModelImpl
+  }
 
   "The card model" should {
     "be persisted" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        val currentCount = cardModel.findAll.size
-        cardModel.create("Force or Will", "Alliances")
-        cardModel.findAll must have size currentCount+1
+        val currentCount = app.cardModel.findAll.size
+        app.cardModel.create("Force or Will", "Alliances")
+        app.cardModel.findAll must have size currentCount+1
+      }
+    }
+
+    "refuse to create duplicates" in {
+      running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
+        app.cardModel.create("Force or Will", "Alliances")
+        app.cardModel.create("Force or Will", "Alliances") must beNone
       }
     }
 
     "have no prices after creating" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        cardModel.create("Force or Will", "Alliances").get.prices must have size 0
+        app.cardModel.create("Force or Will", "Alliances").get.prices must have size 0
       }
     }
 
@@ -51,9 +59,9 @@ class CardModelSpec extends
         "test card"    !!    "AI"            |
         "test card"    !!    "ai"            |>
         { (name, block) =>
-          val card = cardModel.create("Test Card", "Alliances").get
-          val result = cardModel.findByNameAndBlock(name, block)
-          cardModel.delete(card.id)
+          val card = app.cardModel.create("Test Card", "Alliances").get
+          val result = app.cardModel.findByNameAndBlock(name, block)
+          app.cardModel.delete(card.id)
           result must beSome.which { foundCard =>
             foundCard match {
               case Card(card.id, card.name, card.block, _, _) => true
@@ -66,8 +74,18 @@ class CardModelSpec extends
 
     "delegate setting price source to PriceSourceModelComponent" in {
       running(FakeApplication(additionalConfiguration=inMemoryDatabase())) {
-        cardModel.setPriceSource("1", PriceSourceType.StarCity, "http://some.url.com/some/path")
-        there was one(priceSourceModel).setForCard("1", PriceSourceType.StarCity, "http://some.url.com/some/path")
+        val app = new CardModelComponentImpl with
+          TestPricesModelComponentImpl with
+          TestPriceSourceModelComponentImpl with
+          PlayDBProviderComponentImpl {
+
+          val cardModel = new CardModelImpl
+          val pricesModel = new PricesModelImpl
+          val DB = new DBProviderImpl
+          val priceSourceModel = mock[PriceSourceModelImpl]
+        }
+        app.cardModel.setPriceSource("1", PriceSourceType.StarCity, "http://some.url.com/some/path")
+        there was one(app.priceSourceModel).setForCard("1", PriceSourceType.StarCity, "http://some.url.com/some/path")
       }
     }
   }
